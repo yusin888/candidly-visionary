@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -84,12 +85,52 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+        fadeIn: {
+          from: { opacity: '0' },
+          to: { opacity: '1' }
+        },
+        slideInRight: {
+          from: { transform: 'translateX(100%)' },
+          to: { transform: 'translateX(0)' }
+        },
+        slideInLeft: {
+          from: { transform: 'translateX(-100%)' },
+          to: { transform: 'translateX(0)' }
+        },
+        pulse: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.5' }
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' }
+        },
+        wave: {
+          '0%': { transform: 'rotate(0.0deg)' },
+          '10%': { transform: 'rotate(14.0deg)' },
+          '20%': { transform: 'rotate(-8.0deg)' },
+          '30%': { transform: 'rotate(14.0deg)' },
+          '40%': { transform: 'rotate(-4.0deg)' },
+          '50%': { transform: 'rotate(10.0deg)' },
+          '60%': { transform: 'rotate(0.0deg)' },
+          '100%': { transform: 'rotate(0.0deg)' }
+        }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+        'fade-in': 'fadeIn 0.5s ease-out',
+        'slide-in-right': 'slideInRight 0.3s ease-out',
+        'slide-in-left': 'slideInLeft 0.3s ease-out',
+        'pulse-slow': 'pulse 3s infinite',
+        'float': 'float 3s ease-in-out infinite',
+        'wave': 'wave 2.5s infinite'
+			},
+      fontFamily: {
+        sans: ['Inter var', 'Inter', 'SF Pro Text', 'system-ui', 'sans-serif'],
+        display: ['SF Pro Display', 'Inter', 'system-ui', 'sans-serif']
+      }
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
