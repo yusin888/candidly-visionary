@@ -1,4 +1,3 @@
-
 // Mock data for the CandidAI dashboard
 
 export interface Candidate {
@@ -247,8 +246,8 @@ export const timelineEvents = [
 
 // Sample chatbot messages
 export const chatbotMessages = [
-  { sender: 'user', content: 'Show me the top candidates for the Software Engineer role' },
-  { sender: 'bot', content: 'I found 3 top-ranked candidates for Software Engineer positions. Alex Johnson is currently the highest rated with a 91.7 final score. Would you like me to show their detailed profiles?' },
-  { sender: 'user', content: 'What\'s the average technical score for Senior roles?' },
-  { sender: 'bot', content: 'The average technical score for Senior level roles is 92.4, which is 8% higher than the company average across all positions.' }
+  { sender: 'user' as const, content: 'Show me the top candidates for the Software Engineer role' },
+  { sender: 'bot' as const, content: 'I found 3 top-ranked candidates for Software Engineer positions. Alex Johnson is currently the highest rated with a 91.7 final score. Would you like me to show their detailed profiles?' },
+  { sender: 'user' as const, content: 'What\'s the average technical score for Senior roles?' },
+  { sender: 'bot' as const, content: 'The average technical score for Senior level roles is 92.4, which is 8% higher than the company average across all positions.' }
 ];

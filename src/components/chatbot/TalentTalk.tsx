@@ -12,7 +12,10 @@ interface Message {
 }
 
 const TalentTalk = () => {
-  const [messages, setMessages] = useState<Message[]>(chatbotMessages);
+  const [messages, setMessages] = useState<Message[]>(
+    // Type assertion to ensure the imported data matches our interface
+    chatbotMessages as Message[]
+  );
   const [input, setInput] = useState('');
   const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
