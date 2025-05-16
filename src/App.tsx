@@ -11,6 +11,8 @@ import CandidateProfile from "./pages/CandidateProfile";
 import Pipeline from "./pages/Pipeline";
 import Analytics from "./pages/Analytics";
 import TalentTalk from "./pages/TalentTalk";
+import Jobs from "./pages/Jobs";
+import JobDetail from "./pages/JobDetail";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,9 @@ const App = () => (
           <Route path="/pipeline" element={<Pipeline />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/talent-talk" element={<TalentTalk />} />
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/jobs/:id" element={<JobDetail />} />
+          <Route path="/jobs/new" element={<JobDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -10,7 +10,8 @@ import {
   LayoutDashboard, 
   MessageSquare, 
   Settings, 
-  Users 
+  Users,
+  Briefcase 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -34,6 +35,12 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
       icon: <Users className="h-5 w-5" />,
       href: '/candidates',
       active: location.pathname.startsWith('/candidates')
+    },
+    {
+      title: 'Jobs',
+      icon: <Briefcase className="h-5 w-5" />,
+      href: '/jobs',
+      active: location.pathname.startsWith('/jobs')
     },
     {
       title: 'Pipeline Overview',
