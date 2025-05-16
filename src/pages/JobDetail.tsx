@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 
 const JobDetail = () => {
   const { id } = useParams();
-  const isEditMode = id !== 'new';
+  const isEditMode = id !== undefined && id !== 'new';
 
   return (
     <MainLayout>

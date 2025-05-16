@@ -81,6 +81,20 @@ const fetchJobs = async () => {
   }).then(res => res);
 };
 
+interface Job {
+  id: string;
+  title: string;
+  department: string;
+  location: string;
+  usesMultipleHR: boolean;
+  createdAt: Date;
+  criteria: Array<{
+    name: string;
+    weight: number;
+    description: string;
+  }>;
+}
+
 const Jobs = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
@@ -92,14 +106,14 @@ const Jobs = () => {
     queryFn: fetchJobs,
   });
 
-  const filteredJobs = jobs.filter((job: any) =>
+  const filteredJobs = (jobs as Job[]).filter((job) =>
     job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     job.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
     job.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleEdit = (id: string) => {
-    navigate(`/jobs/${id}/edit`);
+    navigate(`/jobs/${id}`);
   };
 
   const handleDelete = (id: string) => {
