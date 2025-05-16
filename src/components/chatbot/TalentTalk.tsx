@@ -1,10 +1,20 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Mic, MicOff, SendHorizonal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { chatbotMessages } from '@/lib/data';
+
+// Declare the custom element for TypeScript
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'elevenlabs-convai': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
+        'agent-id': string;
+      }, HTMLElement>;
+    }
+  }
+}
 
 interface Message {
   sender: 'user' | 'bot';
@@ -18,6 +28,7 @@ const TalentTalk = () => {
   );
   const [input, setInput] = useState('');
   const [isListening, setIsListening] = useState(false);
+  const [showConvai, setShowConvai] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const scrollToBottom = () => {
@@ -27,6 +38,23 @@ const TalentTalk = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Initialize ElevenLabs Convai widget when component mounts
+  useEffect(() => {
+    // Create script element
+    const script = document.createElement('script');
+    script.src = 'https://elevenlabs.io/convai-widget/index.js';
+    script.async = true;
+    script.type = 'text/javascript';
+    
+    // Append script to document
+    document.body.appendChild(script);
+    
+    // Clean up on unmount
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
   
   const handleSend = () => {
     if (!input.trim()) return;
@@ -51,20 +79,15 @@ const TalentTalk = () => {
   };
   
   const toggleListening = () => {
-    if (!isListening) {
-      // Check if browser supports speech recognition
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        setIsListening(true);
-        // This is just a simulation for the demo
-        setTimeout(() => {
-          setInput('Show me the top candidates for Software Engineer');
-          setIsListening(false);
-        }, 3000);
-      } else {
-        alert('Speech recognition is not supported in this browser.');
+    setIsListening(!isListening);
+    setShowConvai(!showConvai);
+    
+    // If turning off, remove the widget from display
+    if (isListening) {
+      const widgetElement = document.querySelector('elevenlabs-convai');
+      if (widgetElement) {
+        (widgetElement as HTMLElement).style.display = 'none';
       }
-    } else {
-      setIsListening(false);
     }
   };
   
@@ -88,7 +111,7 @@ const TalentTalk = () => {
   };
   
   return (
-    <div className="glass-card h-[600px] flex flex-col">
+    <div className="glass-card w-full h-full min-h-[700px] flex flex-col">
       <div className="p-4 border-b border-border/50">
         <h3 className="text-lg font-medium">TalentTalk Assistant</h3>
         <p className="text-sm text-muted-foreground">
@@ -97,12 +120,12 @@ const TalentTalk = () => {
       </div>
       
       <div className="flex-1 p-4 overflow-y-auto">
-        <div className="space-y-4">
+        <div className="space-y-6">
           {messages.map((message, index) => (
             <div
               key={index}
               className={cn(
-                "max-w-[80%] p-4 rounded-xl animate-fade-in",
+                "max-w-[85%] p-4 rounded-xl animate-fade-in",
                 message.sender === 'user' 
                   ? "ml-auto bg-primary text-primary-foreground rounded-br-none" 
                   : "mr-auto glass rounded-bl-none"
@@ -147,6 +170,14 @@ const TalentTalk = () => {
             <SendHorizonal className="h-5 w-5" />
           </Button>
         </div>
+        
+        {showConvai && (
+          <div className="absolute bottom-20 left-0 right-0 flex justify-center">
+            <div className="p-4 bg-background rounded-lg shadow-lg">
+              <elevenlabs-convai agent-id="huqI2oX34TEk8vBTQvKh"></elevenlabs-convai>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

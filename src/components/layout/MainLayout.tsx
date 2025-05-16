@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import Sidebar from './Sidebar';
@@ -15,10 +14,10 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       
       <main className={cn(
-        "flex-1 overflow-y-auto transition-all duration-300 ease-in-out",
+        "flex-1 overflow-y-auto transition-all duration-300 ease-in-out flex flex-col",
         collapsed ? "ml-[80px]" : "ml-[250px]"
       )}>
-        <div className="main-container">
+        <div className="main-container flex flex-col flex-1">
           {children}
         </div>
       </main>
