@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import Header from '@/components/layout/Header';
 import CandidateTable from '@/components/dashboard/CandidateTable';
-import AddCandidateModal from '@/components/candidates/AddCandidateModal';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -23,7 +22,6 @@ import { candidates } from '@/lib/data';
 const CandidatePool = () => {
   const [view, setView] = useState<'all' | 'active' | 'hired' | 'rejected'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   
   // Filter candidates based on view and search query
   const filteredCandidates = candidates.filter(candidate => {
@@ -56,11 +54,6 @@ const CandidatePool = () => {
     active: candidates.filter(c => c.status !== 'hired' && c.status !== 'rejected').length,
     hired: candidates.filter(c => c.status === 'hired').length,
     rejected: candidates.filter(c => c.status === 'rejected').length
-  };
-
-  const handleRefreshCandidates = () => {
-    // In a real implementation, this would fetch fresh data from API
-    console.log('Refreshing candidate data');
   };
 
   return (
@@ -98,7 +91,7 @@ const CandidatePool = () => {
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Button size="sm" onClick={() => setIsAddModalOpen(true)}>
+              <Button size="sm">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Candidate
               </Button>
@@ -140,18 +133,11 @@ const CandidatePool = () => {
         {/* Last Updated Info */}
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <span>Last updated: Today at 10:42 AM</span>
-          <Button variant="ghost" size="sm" className="flex items-center gap-1" onClick={handleRefreshCandidates}>
+          <Button variant="ghost" size="sm" className="flex items-center gap-1">
             <RefreshCcw className="h-3 w-3" />
             Refresh
           </Button>
         </div>
-
-        {/* Add Candidate Modal */}
-        <AddCandidateModal 
-          isOpen={isAddModalOpen} 
-          onClose={() => setIsAddModalOpen(false)}
-          onCandidateAdded={handleRefreshCandidates}
-        />
       </div>
     </MainLayout>
   );
