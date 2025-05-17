@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -40,12 +41,22 @@ const AddCandidateModal = ({ isOpen, onClose, onCandidateAdded }: AddCandidateMo
   const fetchJobs = async () => {
     try {
       setIsJobsLoading(true);
-      const response = await axios.get(`${API_BASE_URL}/api/jobs`);
+      const response = await axios.get(`${API_BASE_URL}/api/jobs`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Access-Control-Allow-Origin': '*' // This doesn't actually solve CORS - CORS must be allowed on server side
+        }
+      });
       setJobs(response.data);
-    } catch (err) {
+    } catch (err: any) {
+      const errorMessage = err.message?.includes("CORS") 
+        ? "CORS error: The server doesn't allow cross-origin requests. Please contact the API provider."
+        : "Failed to load jobs. Please try again.";
+      
       toast({
         title: "Error",
-        description: "Failed to load jobs. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
       console.error("Error fetching jobs:", err);
@@ -97,6 +108,8 @@ const AddCandidateModal = ({ isOpen, onClose, onCandidateAdded }: AddCandidateMo
       await axios.post(`${API_BASE_URL}/api/candidates/upload-parse-score`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          'Accept': 'application/json',
+          'Access-Control-Allow-Origin': '*' // This doesn't actually solve CORS - CORS must be allowed on server side
         },
       });
 
@@ -111,9 +124,16 @@ const AddCandidateModal = ({ isOpen, onClose, onCandidateAdded }: AddCandidateMo
       }
       onClose();
     } catch (err: any) {
+      // Special handling for CORS errors
+      let errorDescription = err.response?.data?.message || "Failed to upload and score candidate";
+      
+      if (err.message?.includes("CORS") || err.message?.includes("Network Error")) {
+        errorDescription = "CORS error: The server doesn't allow cross-origin requests. Please contact the API provider.";
+      }
+      
       toast({
         title: "Error",
-        description: err.response?.data?.message || "Failed to upload and score candidate",
+        description: errorDescription,
         variant: "destructive",
       });
       console.error("Error uploading candidate:", err);
