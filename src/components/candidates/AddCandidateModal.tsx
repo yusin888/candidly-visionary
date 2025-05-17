@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { FileUpload, Upload, File, Loader } from "lucide-react";
+import { Upload, File, Loader } from "lucide-react";
 import axios from "axios";
 
 interface Job {
@@ -207,7 +206,7 @@ const AddCandidateModal = ({ isOpen, onClose, onCandidateAdded }: AddCandidateMo
               </>
             ) : (
               <>
-                <FileUpload className="mr-2 h-4 w-4" />
+                <Upload className="mr-2 h-4 w-4" />
                 Upload & Score
               </>
             )}
