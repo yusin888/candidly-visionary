@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, ChevronUp, Filter, MoreHorizontal } from 'lucide-react';
@@ -189,10 +188,10 @@ const CandidateTable = ({ candidates, onFilter }: CandidateTableProps) => {
                     <div className="w-16 bg-muted h-2 rounded-full mr-2">
                       <div 
                         className="bg-primary h-2 rounded-full" 
-                        style={{ width: `${candidate.finalScore}%` }}
+                        style={{ width: `${candidate.score}%` }}
                       ></div>
                     </div>
-                    <span className="text-sm font-medium">{candidate.finalScore}</span>
+                    <span className="text-sm font-medium">{candidate.score}</span>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm">

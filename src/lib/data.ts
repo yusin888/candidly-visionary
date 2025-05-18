@@ -6,6 +6,7 @@ export interface Candidate {
   role: string;
   status: 'initial' | 'soft_skills' | 'detailed_scoring' | 'final_ranking' | 'hired' | 'rejected';
   experience: number;
+  score: number;
   educationScore: number;
   softSkillsScore: number;
   technicalScore: number;
@@ -55,6 +56,7 @@ export const candidates: Candidate[] = [
     role: 'Senior Software Engineer',
     status: 'final_ranking',
     experience: 8,
+    score: 91.7,
     educationScore: 92,
     softSkillsScore: 88,
     technicalScore: 95,
@@ -68,6 +70,7 @@ export const candidates: Candidate[] = [
     role: 'UX/UI Designer',
     status: 'detailed_scoring',
     experience: 5,
+    score: 88.0,
     educationScore: 84,
     softSkillsScore: 92,
     technicalScore: 88,
@@ -81,6 +84,7 @@ export const candidates: Candidate[] = [
     role: 'Product Manager',
     status: 'soft_skills',
     experience: 6,
+    score: 82.7,
     educationScore: 90,
     softSkillsScore: 76,
     technicalScore: 82,
@@ -94,6 +98,7 @@ export const candidates: Candidate[] = [
     role: 'Data Scientist',
     status: 'initial',
     experience: 3,
+    score: 89.7,
     educationScore: 95,
     softSkillsScore: 84,
     technicalScore: 90,
@@ -107,6 +112,7 @@ export const candidates: Candidate[] = [
     role: 'DevOps Engineer',
     status: 'hired',
     experience: 7,
+    score: 90.7,
     educationScore: 88,
     softSkillsScore: 90,
     technicalScore: 94,
@@ -120,6 +126,7 @@ export const candidates: Candidate[] = [
     role: 'Frontend Developer',
     status: 'rejected',
     experience: 2,
+    score: 78.3,
     educationScore: 82,
     softSkillsScore: 78,
     technicalScore: 75,
@@ -133,6 +140,7 @@ export const candidates: Candidate[] = [
     role: 'Backend Developer',
     status: 'detailed_scoring',
     experience: 4,
+    score: 85.0,
     educationScore: 86,
     softSkillsScore: 80,
     technicalScore: 89,
@@ -146,6 +154,7 @@ export const candidates: Candidate[] = [
     role: 'QA Engineer',
     status: 'soft_skills',
     experience: 5,
+    score: 86.7,
     educationScore: 84,
     softSkillsScore: 86,
     technicalScore: 90,
@@ -159,6 +168,7 @@ export const candidates: Candidate[] = [
     role: 'Systems Architect',
     status: 'final_ranking',
     experience: 9,
+    score: 90.7,
     educationScore: 94,
     softSkillsScore: 82,
     technicalScore: 96,
@@ -172,6 +182,7 @@ export const candidates: Candidate[] = [
     role: 'Machine Learning Engineer',
     status: 'initial',
     experience: 2,
+    score: 87.7,
     educationScore: 96,
     softSkillsScore: 79,
     technicalScore: 88,
