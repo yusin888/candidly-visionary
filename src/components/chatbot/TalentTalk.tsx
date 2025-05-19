@@ -3,7 +3,6 @@ import { Mic, MicOff, SendHorizonal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { chatbotMessages } from '@/lib/data';
 
 // Declare the custom element for TypeScript
 declare global {
@@ -17,19 +16,20 @@ declare global {
 }
 
 interface Message {
-  sender: 'user' | 'bot';
+  sender: 'user' | 'bot' | 'error' | 'feedback';
   content: string;
 }
 
 const TalentTalk = () => {
-  const [messages, setMessages] = useState<Message[]>(
-    // Type assertion to ensure the imported data matches our interface
-    chatbotMessages as Message[]
-  );
+  const [messages, setMessages] = useState<Message[]>([
+    { sender: 'bot', content: "Hello! I'm TalentTalk, your HR assistant. How can I help you today?" }
+  ]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [showConvai, setShowConvai] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const API_URL = 'https://8630-34-82-31-126.ngrok-free.app/simple_chat';
   
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -38,7 +38,13 @@ const TalentTalk = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
+  
+  useEffect(() => {
+    // Focus the input when component mounts
+    const input = document.querySelector('input');
+    if (input) input.focus();
+  }, []);
+  
   // Initialize ElevenLabs Convai widget when component mounts
   useEffect(() => {
     // Create script element
@@ -56,20 +62,68 @@ const TalentTalk = () => {
     };
   }, []);
   
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
     
     // Add user message
-    setMessages([...messages, { sender: 'user', content: input }]);
+    const userMessage = { sender: 'user' as const, content: input };
+    setMessages([...messages, userMessage]);
     setInput('');
     
-    // Simulate bot response
-    setTimeout(() => {
+    // Set loading state
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_input: input
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Response received:', data);
+      
+      // Show bot response
+      if (data.reply) {
+        setMessages(prev => [...prev, {
+          sender: 'bot' as const,
+          content: data.reply
+        }]);
+      }
+      
+      // Show error if present
+      if (data.ollama_error) {
+        console.error('API error:', data.ollama_error);
+        setMessages(prev => [...prev, {
+          sender: 'error' as const,
+          content: `Error: ${data.ollama_error}`
+        }]);
+      }
+      
+      // Show function call feedback if present
+      if (data.function_call_feedback) {
+        setMessages(prev => [...prev, {
+          sender: 'feedback' as const,
+          content: `Action Result: ${data.function_call_feedback}`
+        }]);
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
       setMessages(prev => [...prev, {
-        sender: 'bot',
-        content: getRandomResponse(input)
+        sender: 'error' as const,
+        content: `Failed to get response: ${error instanceof Error ? error.message : 'Unknown error'}`
       }]);
-    }, 1000);
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -91,94 +145,83 @@ const TalentTalk = () => {
     }
   };
   
-  // Simple responses for demo purposes
-  const getRandomResponse = (query: string) => {
-    const lowercaseQuery = query.toLowerCase();
-    
-    if (lowercaseQuery.includes('top candidates')) {
-      return "I found 3 top-ranked candidates matching your criteria: Alex Johnson (91.7), James Wilson (90.7), and David Kim (90.7). Would you like to see their detailed profiles?";
-    }
-    
-    if (lowercaseQuery.includes('average') || lowercaseQuery.includes('score')) {
-      return "The average final score across all candidates is 86.3. This is a 5% improvement from the previous month. Technical scores are particularly strong at 89.2 on average.";
-    }
-    
-    if (lowercaseQuery.includes('progress') || lowercaseQuery.includes('pipeline')) {
-      return "Currently there are 24 candidates in the final ranking stage. The biggest bottleneck is in the soft skills evaluation with 16 candidates pending for over 5 days.";
-    }
-    
-    return "I'm here to help with candidate information and insights. You can ask me about top candidates, scores, pipeline progress, or specific candidate details.";
-  };
-  
   return (
-    <div className="glass-card w-full h-full min-h-[700px] flex flex-col">
-      <div className="p-4 border-b border-border/50">
-        <h3 className="text-lg font-medium">TalentTalk Assistant</h3>
-        <p className="text-sm text-muted-foreground">
-          Ask questions or use voice commands to get insights about candidates
-        </p>
+    <div className="w-full h-full flex flex-col rounded-lg overflow-hidden shadow-lg bg-white">
+      <div className="bg-[#2c3e50] text-white p-4 text-center text-lg font-medium">
+        TalentTalk HR Assistant
       </div>
       
-      <div className="flex-1 p-4 overflow-y-auto">
-        <div className="space-y-6">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={cn(
-                "max-w-[85%] p-4 rounded-xl animate-fade-in",
-                message.sender === 'user' 
-                  ? "ml-auto bg-primary text-primary-foreground rounded-br-none" 
-                  : "mr-auto glass rounded-bl-none"
-              )}
-            >
-              {message.content}
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-      </div>
-      
-      <div className="p-4 border-t border-border/50">
-        <div className="flex items-center space-x-2">
-          <Button
-            variant={isListening ? "default" : "outline"}
-            size="icon"
+      <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-3">
+        {messages.map((message, index) => (
+          <div
+            key={index}
             className={cn(
-              "h-10 w-10 rounded-full",
-              isListening && "animate-pulse bg-accent text-accent-foreground"
+              "p-3 rounded-[18px] max-w-[80%] break-words",
+              message.sender === 'user' 
+                ? "self-end bg-[#3498db] text-white rounded-br-[5px]" 
+                : message.sender === 'bot'
+                  ? "self-start bg-[#e9e9eb] text-[#333] rounded-bl-[5px]"
+                  : message.sender === 'error'
+                    ? "self-start bg-[#e74c3c] text-white rounded-bl-[5px]"
+                    : "self-start bg-[#2ecc71] text-white rounded-bl-[5px]"
             )}
-            onClick={toggleListening}
           >
-            {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-          </Button>
-          
-          <Input
-            placeholder="Type a message or press mic to speak..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            className="flex-1"
-          />
-          
-          <Button
-            variant="default"
-            size="icon"
-            className="h-10 w-10 rounded-full"
-            onClick={handleSend}
-            disabled={!input.trim()}
-          >
-            <SendHorizonal className="h-5 w-5" />
-          </Button>
-        </div>
-        
-        {showConvai && (
-          <div className="absolute bottom-20 left-0 right-0 flex justify-center">
-            <div className="p-4 bg-background rounded-lg shadow-lg">
-              <elevenlabs-convai agent-id="huqI2oX34TEk8vBTQvKh"></elevenlabs-convai>
+            {message.content}
+          </div>
+        ))}
+        {isLoading && (
+          <div className="self-start bg-[#e9e9eb] p-2 rounded-[18px] rounded-bl-[5px]">
+            <div className="flex space-x-1">
+              <span className="inline-block w-2 h-2 bg-[#666] rounded-full animate-bounce"></span>
+              <span className="inline-block w-2 h-2 bg-[#666] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+              <span className="inline-block w-2 h-2 bg-[#666] rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></span>
             </div>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
+      
+      <div className="flex p-3 border-t border-[#e9e9eb]">
+        <Button
+          className={cn(
+            "h-10 w-10 rounded-full flex items-center justify-center",
+            isListening 
+              ? "bg-[#e74c3c] text-white hover:bg-[#c0392b]" 
+              : "bg-[#ecf0f1] text-[#7f8c8d] hover:bg-[#bdc3c7]"
+          )}
+          onClick={toggleListening}
+        >
+          {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+        </Button>
+        
+        <Input
+          placeholder="Type your message here..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyPress={handleKeyPress}
+          className="flex-1 px-4 py-2 mx-2 border border-[#ddd] rounded-full focus:outline-none focus:ring-2 focus:ring-[#2c3e50] focus:border-transparent"
+          disabled={isLoading}
+        />
+        
+        <Button
+          className={cn(
+            "bg-[#2c3e50] text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-[#1a252f]",
+            (isLoading || !input.trim()) && "bg-[#95a5a6] cursor-not-allowed hover:bg-[#95a5a6]"
+          )}
+          onClick={handleSend}
+          disabled={!input.trim() || isLoading}
+        >
+          <SendHorizonal className="h-5 w-5" />
+        </Button>
+      </div>
+      
+      {showConvai && (
+        <div className="absolute bottom-20 left-0 right-0 flex justify-center">
+          <div className="p-4 bg-white rounded-lg shadow-lg">
+            <elevenlabs-convai agent-id="huqI2oX34TEk8vBTQvKh"></elevenlabs-convai>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
